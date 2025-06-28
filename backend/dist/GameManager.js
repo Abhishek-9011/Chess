@@ -24,21 +24,21 @@ class GameManager {
             const message = JSON.parse(data.toString());
             if (message.type === messages_1.INIT_GAME) {
                 if (this.pendingUser) {
+                    console.log("Both users connected");
                     const game = new Game_1.Game(this.pendingUser, socket);
                     this.games.push(game);
                     this.pendingUser = null;
                 }
                 else {
+                    console.log("pending state");
                     this.pendingUser = socket;
-                    this.pendingUser.send(JSON.stringify({
-                        message: "you are in pending state",
-                    }));
                 }
             }
             if (message.type === messages_1.MOVE) {
+                console.log("one person moves" + JSON.stringify(message.payload.move));
                 const game = this.games.find((game) => game.player1 === socket || game.player2 === socket);
                 if (game) {
-                    game.makeMove(socket, message.move);
+                    game.makeMove(socket, message.payload.move);
                 }
             }
         });

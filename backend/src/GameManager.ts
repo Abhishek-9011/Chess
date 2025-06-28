@@ -1,5 +1,5 @@
 import WebSocket from "ws";
-import { INIT_GAME, MOVE } from "./messages";
+import { INIT_GAME, MOVE, PENDING_STATE } from "./messages";
 import { Game } from "./Game";
 let userCount = 0;
 export class GameManager {
@@ -25,24 +25,24 @@ export class GameManager {
       const message = JSON.parse(data.toString());
       if (message.type === INIT_GAME) {
         if (this.pendingUser) {
+          console.log("Both users connected");
           const game = new Game(this.pendingUser, socket);
           this.games.push(game);
           this.pendingUser = null;
         } else {
+          console.log("pending state");
+
           this.pendingUser = socket;
-          this.pendingUser.send( 
-            JSON.stringify({
-              message: "you are in pending state",
-            })
-          );
         }
       }
       if (message.type === MOVE) {
+        console.log("one person moves"+JSON.stringify(message.payload.move));
+        
         const game = this.games.find(
           (game) => game.player1 === socket || game.player2 === socket
         );
         if (game) {
-          game.makeMove(socket, message.move);
+          game.makeMove(socket, message.payload.move);
         }
       }
     });

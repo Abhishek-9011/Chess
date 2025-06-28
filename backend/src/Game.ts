@@ -6,6 +6,7 @@ export class Game {
   public player2: WebSocket;
   private board: Chess;
   private startTime: Date;
+  private moveCount = 0;
   constructor(player1: WebSocket, player2: WebSocket) {
     this.player1 = player1;
     this.player2 = player2;
@@ -51,8 +52,9 @@ export class Game {
           },
         })
       );
+      return;
     }
-    if (this.board.moves().length % 2 === 0) {
+    if (this.moveCount % 2 === 0) {
       this.player2.send(
         JSON.stringify({
           type: MOVE,
@@ -67,5 +69,6 @@ export class Game {
         })
       );
     }
+    this.moveCount++;
   }
 }

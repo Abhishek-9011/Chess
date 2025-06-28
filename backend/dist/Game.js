@@ -5,6 +5,7 @@ const chess_js_1 = require("chess.js");
 const messages_1 = require("./messages");
 class Game {
     constructor(player1, player2) {
+        this.moveCount = 0;
         this.player1 = player1;
         this.player2 = player2;
         this.board = new chess_js_1.Chess();
@@ -42,19 +43,21 @@ class Game {
                     winner: this.board.turn() === "w" ? "black" : "white",
                 },
             }));
+            return;
         }
-        if (this.board.moves.length % 2 === 0) {
-            this.player2.emit(JSON.stringify({
+        if (this.moveCount % 2 === 0) {
+            this.player2.send(JSON.stringify({
                 type: messages_1.MOVE,
                 playload: move,
             }));
         }
         else {
-            this.player1.emit(JSON.stringify({
+            this.player1.send(JSON.stringify({
                 type: messages_1.MOVE,
                 playload: move,
             }));
         }
+        this.moveCount++;
     }
 }
 exports.Game = Game;
