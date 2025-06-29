@@ -8,19 +8,22 @@ const Game = () => {
   const socket = useSocket();
   const [chess, setChess] = useState(new Chess());
   const [board, setBoard] = useState(chess.board());
-
+  const [started, setStarted] = useState(false); 
   useEffect(() => {
     if (!socket) return;
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
       switch (message.type) {
         case INIT_GAME:
-          setChess(new Chess());
           setBoard(chess.board());
+          setStarted(true)
           console.log("initialised");
           break;
         case MOVE:
-          console.log(JSON.stringify(message.move));
+          console.log("We are now in move case");
+          console.log(message);
+          console.log(message.payload);
+          
           const move = message.payload;
           chess.move(move);
           setBoard(chess.board());
@@ -63,12 +66,12 @@ const Game = () => {
 
           <div className="w-full lg:w-1/4">
             <div className="bg-gray-800 rounded-xl p-6 shadow-2xl border border-gray-700">
-              <button
+              { !started && <button
                 onClick={handlePlay}
                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg"
               >
                 Start New Game
-              </button>
+              </button>}
 
               <div className="mt-6">
                 <h3 className="text-lg font-semibold mb-2 text-gray-300">

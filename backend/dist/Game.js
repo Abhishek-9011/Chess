@@ -48,13 +48,13 @@ class Game {
         if (this.moveCount % 2 === 0) {
             this.player2.send(JSON.stringify({
                 type: messages_1.MOVE,
-                playload: move,
+                payload: move,
             }));
         }
         else {
             this.player1.send(JSON.stringify({
                 type: messages_1.MOVE,
-                playload: move,
+                payload: move,
             }));
         }
         this.moveCount++;

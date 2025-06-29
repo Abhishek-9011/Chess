@@ -58,14 +58,14 @@ export class Game {
       this.player2.send(
         JSON.stringify({
           type: MOVE,
-          playload: move,
+          payload: move,
         })
       );
     } else {
       this.player1.send(
         JSON.stringify({
           type: MOVE,
-          playload: move,
+          payload: move,
         })
       );
     }

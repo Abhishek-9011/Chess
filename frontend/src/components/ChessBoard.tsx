@@ -1,6 +1,29 @@
 import type { Color, PieceSymbol, Square } from "chess.js";
-import  { useState } from "react";
+import { useState } from "react";
 import { MOVE } from "../config/messages";
+
+// ♟ Helper to get Unicode symbol
+// const getPieceUnicode = (type: PieceSymbol, color: Color): string => {
+//   const pieces: Record<Color, Record<PieceSymbol, string>> = {
+//     w: {
+//       p: "♙",
+//       r: "♖",
+//       n: "♘",
+//       b: "♗",
+//       q: "♕",
+//       k: "♔",
+//     },
+//     b: {
+//       p: "♟",
+//       r: "♜",
+//       n: "♞",
+//       b: "♝",
+//       q: "♛",
+//       k: "♚",
+//     },
+//   };
+//   return pieces[color][type]; // This assumes color is 'w' or 'b'
+// };
 
 const ChessBoard = ({
   chess,
@@ -18,23 +41,23 @@ const ChessBoard = ({
   chess: any;
 }) => {
   const [from, setFrom] = useState<null | Square>();
-  const [to, setTo] = useState<null | Square>();
+
   return (
-    <div className="text-white-200">  
+    <div>
       {board.map((row, i) => {
         return (
           <div key={i} className="flex">
-            {row.map((square, j) => { 
+            {row.map((square, j) => {
               const squareRepresetation = (String.fromCharCode(97 + (j % 8)) +
-                "" +
                 (8 - i)) as Square;
+
               return (
                 <div
                   onClick={() => {
                     if (!from) {
                       setFrom(squareRepresetation);
                     } else {
-                      socket.send(   
+                      socket.send(
                         JSON.stringify({
                           type: MOVE,
                           payload: {
@@ -45,26 +68,29 @@ const ChessBoard = ({
                           },
                         })
                       );
-                      setFrom(null);
                       chess.move({
                         from,
                         to: squareRepresetation,
                       });
                       setBoard(chess.board());
+                      setFrom(null);
                     }
-                  }
-                }
+                  }}
                   key={j}
-                  className={`w-23 h-20 ${ 
-                    (i + j) % 2 === 0 ? " bg-green-500" : "bg-white"
-                  } `}
+                  className={`w-20 h-20 text-3xl flex items-center justify-center cursor-pointer ${
+                    (i + j) % 2 === 0 ? "bg-green-500" : "bg-green-200"
+                  }`}
                 >
-                  <div className=" w-full justify-center flex h-full">
-                    {" "}
-                    <div className="text-black h-full justify-center flex flex-col">
-                      {square ? square.type : ""}
-                    </div>
-                  </div>
+                  {square ? (
+                    <img
+                      className="w-4"
+                      src={`/${
+                        square?.color === "b"
+                          ? square?.type
+                          : `${square?.type?.toUpperCase() + "_"}`
+                      }.png`}
+                    />
+                  ) : null}
                 </div>
               );
             })}
