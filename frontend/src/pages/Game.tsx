@@ -8,30 +8,28 @@ const Game = () => {
   const socket = useSocket();
   const [chess, setChess] = useState(new Chess());
   const [board, setBoard] = useState(chess.board());
-  const [started, setStarted] = useState(false); 
+  const [started, setStarted] = useState(false);
+  const [color, setColor] = useState("");
+
   useEffect(() => {
     if (!socket) return;
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
       switch (message.type) {
         case INIT_GAME:
+          const assignedColor = message.payload.color;
+          setColor(assignedColor);
           setBoard(chess.board());
-          setStarted(true)
-          console.log("initialised");
+          setStarted(true);
           break;
         case MOVE:
-          console.log("We are now in move case");
-          console.log(message);
-          console.log(message.payload);
-          
           const move = message.payload;
           chess.move(move);
           setBoard(chess.board());
-          console.log("move made");
           break;
       }
     };
-  }, [socket]);
+  }, [socket, chess]);
 
   if (!socket)
     return (
@@ -41,7 +39,6 @@ const Game = () => {
     );
 
   const handlePlay = () => {
-    console.log("handle play called");
     socket.send(
       JSON.stringify({
         type: INIT_GAME,
@@ -51,38 +48,52 @@ const Game = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
-      <div className="container mx-auto px-4 py-12">
-        <div className="flex flex-col lg:flex-row gap-8 items-start">
-          <div className="w-full lg:w-3/4">
-            <div className="bg-gray-800 rounded-xl shadow-2xl overflow-hidden border border-gray-700">
+      <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
+        <div className="flex flex-col xl:flex-row gap-4 sm:gap-6 md:gap-8 items-center xl:items-start">
+          {/* Chess Board Section */}
+          <div className="w-full xl:w-3/4 max-w-2xl xl:max-w-none">
+            <div className="bg-gray-800 rounded-lg sm:rounded-xl shadow-lg sm:shadow-2xl overflow-hidden border border-gray-700">
               <ChessBoard
                 chess={chess}
                 setBoard={setBoard}
                 board={board}
                 socket={socket}
+                color={color}
               />
             </div>
           </div>
 
-          <div className="w-full lg:w-1/4">
-            <div className="bg-gray-800 rounded-xl p-6 shadow-2xl border border-gray-700">
-              { !started && <button
-                onClick={handlePlay}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg"
-              >
-                Start New Game
-              </button>}
+          {/* Game Controls Section */}
+          <div className="w-full xl:w-1/4 max-w-md xl:max-w-none">
+            <div className="bg-gray-800 rounded-lg sm:rounded-xl p-4 sm:p-6 shadow-lg sm:shadow-2xl border border-gray-700">
+              {!started && (
+                <button
+                  onClick={handlePlay}
+                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 sm:py-3 px-3 sm:px-4 rounded-md sm:rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md sm:shadow-lg"
+                >
+                  Start New Game
+                </button>
+              )}
 
-              <div className="mt-6">
-                <h3 className="text-lg font-semibold mb-2 text-gray-300">
+              <div className="mt-4 sm:mt-6">
+                <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-300">
                   Game Status
                 </h3>
-                <div className="bg-gray-700 rounded-lg p-4 text-sm text-gray-200">
+                <div className="bg-gray-700 rounded-md sm:rounded-lg p-3 sm:p-4 text-xs sm:text-sm text-gray-200">
                   {chess.isGameOver() ? (
                     <p className="text-red-400">Game Over</p>
                   ) : (
                     <p>{chess.turn() === "w" ? "White" : "Black"}'s turn</p>
                   )}
+                </div>
+              </div>
+
+              <div className="mt-4 sm:mt-6">
+                <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-300">
+                  Your Color
+                </h3>
+                <div className="bg-gray-700 rounded-md sm:rounded-lg p-3 sm:p-4 text-xs sm:text-sm text-gray-200 capitalize">
+                  {color || "Not assigned"}
                 </div>
               </div>
             </div>

@@ -2,34 +2,12 @@ import type { Color, PieceSymbol, Square } from "chess.js";
 import { useState } from "react";
 import { MOVE } from "../config/messages";
 
-// ♟ Helper to get Unicode symbol
-// const getPieceUnicode = (type: PieceSymbol, color: Color): string => {
-//   const pieces: Record<Color, Record<PieceSymbol, string>> = {
-//     w: {
-//       p: "♙",
-//       r: "♖",
-//       n: "♘",
-//       b: "♗",
-//       q: "♕",
-//       k: "♔",
-//     },
-//     b: {
-//       p: "♟",
-//       r: "♜",
-//       n: "♞",
-//       b: "♝",
-//       q: "♛",
-//       k: "♚",
-//     },
-//   };
-//   return pieces[color][type]; // This assumes color is 'w' or 'b'
-// };
-
 const ChessBoard = ({
   chess,
   board,
   socket,
   setBoard,
+  color,
 }: {
   board: ({
     square: Square;
@@ -39,6 +17,7 @@ const ChessBoard = ({
   socket: WebSocket;
   setBoard: any;
   chess: any;
+  color: any;
 }) => {
   const [from, setFrom] = useState<null | Square>();
 
@@ -54,6 +33,9 @@ const ChessBoard = ({
               return (
                 <div
                   onClick={() => {
+                    if (chess.turn() !== (color === "white" ? "w" : "b")) {
+                      return;
+                    }
                     if (!from) {
                       setFrom(squareRepresetation);
                     } else {
@@ -83,7 +65,7 @@ const ChessBoard = ({
                 >
                   {square ? (
                     <img
-                      className="w-4"
+                      className="w-10"
                       src={`/${
                         square?.color === "b"
                           ? square?.type
