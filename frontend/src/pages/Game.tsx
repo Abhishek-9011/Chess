@@ -33,8 +33,22 @@ const Game = () => {
 
   if (!socket)
     return (
-      <div className="flex items-center justify-center h-screen text-xl text-gray-600">
-        Connecting to server...
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="relative mb-8">
+            <div className="w-16 h-16 mx-auto mb-4">
+              <div className="absolute inset-0 rounded-full border-4 border-purple-200 opacity-25"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-purple-500 border-t-transparent animate-spin"></div>
+            </div>
+            <div className="flex justify-center space-x-1 mb-4">
+              <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+              <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+              <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold text-white mb-2">Connecting to Server</h2>
+          <p className="text-purple-200 text-lg">Establishing secure connection...</p>
+        </div>
       </div>
     );
 
@@ -62,7 +76,6 @@ const Game = () => {
               />
             </div>
           </div>
-
           {/* Game Controls Section */}
           <div className="w-full xl:w-1/4 max-w-md xl:max-w-none">
             <div className="bg-gray-800 rounded-lg sm:rounded-xl p-4 sm:p-6 shadow-lg sm:shadow-2xl border border-gray-700">
@@ -74,7 +87,6 @@ const Game = () => {
                   Start New Game
                 </button>
               )}
-
               <div className="mt-4 sm:mt-6">
                 <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-300">
                   Game Status
@@ -87,7 +99,6 @@ const Game = () => {
                   )}
                 </div>
               </div>
-
               <div className="mt-4 sm:mt-6">
                 <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-300">
                   Your Color
