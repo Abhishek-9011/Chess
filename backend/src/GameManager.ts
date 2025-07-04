@@ -24,20 +24,24 @@ export class GameManager {
     socket.on("message", (data) => {
       const message = JSON.parse(data.toString());
       if (message.type === INIT_GAME) {
-        if (this.pendingUser && this.pendingUser!=socket) {
+        if (this.pendingUser && this.pendingUser != socket) {
           console.log("Both users connected");
           const game = new Game(this.pendingUser, socket);
           this.games.push(game);
           this.pendingUser = null;
         } else {
           console.log("pending state");
-
+          socket.send(
+            JSON.stringify({
+              type: PENDING_STATE,
+            })
+          );
           this.pendingUser = socket;
         }
       }
       if (message.type === MOVE) {
-        console.log("one person moves"+JSON.stringify(message.payload.move));
-        
+        console.log("one person moves" + JSON.stringify(message.payload.move));
+
         const game = this.games.find(
           (game) => game.player1 === socket || game.player2 === socket
         );

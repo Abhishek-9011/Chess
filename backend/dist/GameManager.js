@@ -31,6 +31,9 @@ class GameManager {
                 }
                 else {
                     console.log("pending state");
+                    socket.send(JSON.stringify({
+                        type: messages_1.PENDING_STATE,
+                    }));
                     this.pendingUser = socket;
                 }
             }

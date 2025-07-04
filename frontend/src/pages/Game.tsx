@@ -2,7 +2,7 @@ import ChessBoard from "../components/ChessBoard";
 import { useSocket } from "../hooks/useSocket";
 import { useEffect, useState } from "react";
 import { Chess } from "chess.js";
-import { INIT_GAME, MOVE } from "../config/messages";
+import { INIT_GAME, MOVE, PENDING_STATE } from "../config/messages";
 
 const Game = () => {
   const socket = useSocket();
@@ -10,7 +10,7 @@ const Game = () => {
   const [board, setBoard] = useState(chess.board());
   const [started, setStarted] = useState(false);
   const [color, setColor] = useState("");
-
+  const [pending, setPending] = useState(false);
   useEffect(() => {
     if (!socket) return;
     socket.onmessage = (event) => {
@@ -21,6 +21,11 @@ const Game = () => {
           setColor(assignedColor);
           setBoard(chess.board());
           setStarted(true);
+          setPending(false);
+          break;
+        case PENDING_STATE:
+          console.log("pending state");
+          setPending(true);
           break;
         case MOVE:
           const move = message.payload;
@@ -41,13 +46,26 @@ const Game = () => {
               <div className="absolute inset-0 rounded-full border-4 border-purple-500 border-t-transparent animate-spin"></div>
             </div>
             <div className="flex justify-center space-x-1 mb-4">
-              <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
-              <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
-              <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+              <div
+                className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"
+                style={{ animationDelay: "0ms" }}
+              ></div>
+              <div
+                className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"
+                style={{ animationDelay: "150ms" }}
+              ></div>
+              <div
+                className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"
+                style={{ animationDelay: "300ms" }}
+              ></div>
             </div>
           </div>
-          <h2 className="text-2xl font-bold text-white mb-2">Connecting to Server</h2>
-          <p className="text-purple-200 text-lg">Establishing secure connection...</p>
+          <h2 className="text-2xl font-bold text-white mb-2">
+            Connecting to Server
+          </h2>
+          <p className="text-purple-200 text-lg">
+            Establishing secure connection...
+          </p>
         </div>
       </div>
     );
@@ -84,7 +102,7 @@ const Game = () => {
                   onClick={handlePlay}
                   className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 sm:py-3 px-3 sm:px-4 rounded-md sm:rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md sm:shadow-lg"
                 >
-                  Start New Game
+                  {pending ? "Searchning for another payer" : "Start New Game"}
                 </button>
               )}
               <div className="mt-4 sm:mt-6">
