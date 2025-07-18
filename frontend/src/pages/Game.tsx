@@ -3,6 +3,7 @@ import { useSocket } from "../hooks/useSocket";
 import { useEffect, useState } from "react";
 import { Chess } from "chess.js";
 import { INIT_GAME, MOVE, PENDING_STATE } from "../config/messages";
+import Loading from "./Loading";
 
 const Game = () => {
   interface Move {
@@ -49,42 +50,10 @@ const Game = () => {
     };
   }, [socket, chess]);
 
-  if (!socket)
-    return (
-      // <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-      //   <div className="text-center">
-      //     <div className="relative mb-8">
-      //       <div className="w-16 h-16 mx-auto mb-4">
-      //         <div className="absolute inset-0 rounded-full border-4 border-purple-200 opacity-25"></div>
-      //         <div className="absolute inset-0 rounded-full border-4 border-purple-500 border-t-transparent animate-spin"></div>
-      //       </div>
-      //       <div className="flex justify-center space-x-1 mb-4">
-      //         <div
-      //           className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"
-      //           style={{ animationDelay: "0ms" }}
-      //         ></div>
-      //         <div
-      //           className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"
-      //           style={{ animationDelay: "150ms" }}
-      //         ></div>
-      //         <div
-      //           className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"
-      //           style={{ animationDelay: "300ms" }}
-      //         ></div>
-      //       </div>
-      //     </div>
-      //     <h2 className="text-2xl font-bold text-white mb-2">
-      //       Connecting to Server
-      //     </h2>
-      //     <p className="text-purple-200 text-lg">
-      //       Establishing secure connection...
-      //     </p>
-      //   </div>
-      // </div>
-      <>
-        <h1>Loadinng</h1>
-      </>
-    );
+if (!socket)
+  return (
+   <Loading/>
+  );
 
   const handlePlay = () => {
     socket.send(
