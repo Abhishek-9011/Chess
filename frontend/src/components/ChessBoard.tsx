@@ -8,16 +8,21 @@ const ChessBoard = ({
   socket,
   setBoard,
   color,
+  setMoves, // ✅ Accept this prop
 }: {
-  board: ({
-    square: Square;
-    type: PieceSymbol;
-    color: Color;
-  } | null)[][];
+  board: (
+    | {
+        square: Square;
+        type: PieceSymbol;
+        color: Color;
+      }
+    | null
+  )[][];
   socket: WebSocket;
   setBoard: any;
   chess: any;
   color: any;
+  setMoves:any;
 }) => {
   const [from, setFrom] = useState<null | Square>(null);
   const [validMoves, setValidMoves] = useState<Square[]>([]);
@@ -55,28 +60,32 @@ const ChessBoard = ({
                     if (chess.turn() !== (color === "white" ? "w" : "b")) {
                       return;
                     }
+
                     if (!from) {
                       if (square && square.color === (color === "white" ? "w" : "b")) {
                         setFrom(squareRepresentation);
                       }
                     } else {
                       if (isValidMove || squareRepresentation === from) {
+                        const move = {
+                          from,
+                          to: squareRepresentation,
+                        };
+
+                        // 1. Send move to server
                         socket.send(
                           JSON.stringify({
                             type: MOVE,
-                            payload: {
-                              move: {
-                                from,
-                                to: squareRepresentation,
-                              },
-                            },
+                            payload: { move },
                           })
                         );
-                        chess.move({
-                          from,
-                          to: squareRepresentation,
-                        });
+
+                        // 2. Make move locally
+                        chess.move(move);
                         setBoard(chess.board());
+
+                        // 3. ✅ Track move (made by self)
+                        setMoves((prev:any) => [...prev, { ...move, by: "me" }]);
                       }
                       setFrom(null);
                     }
@@ -84,9 +93,7 @@ const ChessBoard = ({
                   key={j}
                   className={`w-20 h-20 text-3xl flex items-center justify-center cursor-pointer relative ${
                     (i + j) % 2 === 0 ? "bg-green-500" : "bg-green-200"
-                  } ${
-                    isSelected ? "border-4 border-blue-500" : ""
-                  }`}
+                  } ${isSelected ? "border-4 border-blue-500" : ""}`}
                 >
                   {square ? (
                     <img
@@ -94,8 +101,9 @@ const ChessBoard = ({
                       src={`/${
                         square?.color === "b"
                           ? square?.type
-                          : `${square?.type?.toUpperCase() + "_"}`
+                          : `${square?.type?.toUpperCase()}_`
                       }.png`}
+                      alt=""
                     />
                   ) : null}
                   {isValidMove && !square && (

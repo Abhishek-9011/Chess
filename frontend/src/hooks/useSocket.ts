@@ -8,7 +8,7 @@ export const useSocket = () => {
       console.log("connected");
       setSocket(ws);
     };
-    ws.onclose = () => {
+    ws.onclose = () => {    
       console.log("disconnected");
       setSocket(null);
     };
