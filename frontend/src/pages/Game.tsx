@@ -2,7 +2,7 @@ import ChessBoard from "../components/ChessBoard";
 import { useSocket } from "../hooks/useSocket";
 import { useEffect, useState } from "react";
 import { Chess } from "chess.js";
-import { INIT_GAME, MOVE, PENDING_STATE } from "../config/messages";
+import { INIT_GAME, MOVE, PENDING_STATE, GAME_STATUS } from "../config/messages";
 import Loading from "./Loading";
 
 const Game = () => {
@@ -18,6 +18,7 @@ const Game = () => {
   const [color, setColor] = useState("");
   const [pending, setPending] = useState(false);
   const [moves, setMoves] = useState([]);
+  const [gameStatus, setGameStatus] = useState({ isCheck: false, isCheckmate: false, isStalemate: false });
   useEffect(() => {
     if (!socket) return;
     socket.onmessage = (event) => {
@@ -45,6 +46,9 @@ const Game = () => {
           //@ts-ignore
           setMoves((prev) => [...prev, { ...move, by: "opponent" }]);
 
+          break;
+        case GAME_STATUS:
+          setGameStatus(message.payload);
           break;
       }
     };
@@ -123,11 +127,19 @@ if (!socket)
                   Game Status
                 </h3>
 
-                <div className="bg-gray-700 rounded-md sm:rounded-lg p-3 sm:p-4 text-xs sm:text-sm text-gray-200">
-                  {chess.isGameOver() ? (
-                    <p className="text-red-400">Game Over</p>
-                  ) : (
-                    <p>{chess.turn() === "w" ? "White" : "Black"}'s turn</p>
+                <div className="bg-gray-700 rounded-md sm:rounded-lg p-3 sm:p-4 text-xs sm:text-sm text-gray-200 space-y-2">
+                  <p>{chess.turn() === "w" ? "White" : "Black"}'s turn</p>
+                  {gameStatus.isCheckmate && (
+                    <p className="text-red-400 font-bold animate-pulse">⚠️ Checkmate!</p>
+                  )}
+                  {gameStatus.isCheck && !gameStatus.isCheckmate && (
+                    <p className="text-orange-400 font-bold">⚠️ Check!</p>
+                  )}
+                  {gameStatus.isStalemate && (
+                    <p className="text-yellow-400 font-bold">Draw - Stalemate</p>
+                  )}
+                  {chess.isGameOver() && (
+                    <p className="text-red-400 font-bold">Game Over</p>
                   )}
                 </div>
               </div>

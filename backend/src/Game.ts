@@ -1,6 +1,6 @@
 import { Chess } from "chess.js";
 import { WebSocket } from "ws";
-import { GAME_OVER, INIT_GAME, MOVE } from "./messages";
+import { GAME_OVER, INIT_GAME, MOVE, GAME_STATUS } from "./messages";
 export class Game {
   public player1: WebSocket;
   public player2: WebSocket;
@@ -29,14 +29,14 @@ export class Game {
       })
     );
   }
-  makeMove(socket: WebSocket, move: { from: string; to: string }) {
+  makeMove(socket: WebSocket, move: { from: string; to: string; promotion?: "q" | "r" | "b" | "n" }) {
     try {
       this.board.move(move);
     } catch (e) {
       return;
     }
     if (this.board.isGameOver()) {
-      this.player1.emit(
+      this.player1.send(
         JSON.stringify({
           type: GAME_OVER,
           payload: {
@@ -44,7 +44,7 @@ export class Game {
           },
         })
       );
-      this.player2.emit(
+      this.player2.send(
         JSON.stringify({
           type: GAME_OVER,
           payload: {
@@ -69,6 +69,20 @@ export class Game {
         })
       );
     }
+
+    // Send game status to opponent (check/checkmate/stalemate)
+    const opponent = this.moveCount % 2 === 0 ? this.player2 : this.player1;
+    opponent.send(
+      JSON.stringify({
+        type: GAME_STATUS,
+        payload: {
+          isCheck: this.board.isCheck(),
+          isCheckmate: this.board.isCheckmate(),
+          isStalemate: this.board.isStalemate(),
+        },
+      })
+    );
+
     this.moveCount++;
   }
 }
