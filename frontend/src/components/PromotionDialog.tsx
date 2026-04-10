@@ -1,4 +1,3 @@
-import { useState } from "react";
 
 interface PromotionDialogProps {
   onSelect: (piece: "q" | "r" | "b" | "n") => void;
